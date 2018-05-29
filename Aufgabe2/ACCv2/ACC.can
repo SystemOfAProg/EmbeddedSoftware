@@ -1,44 +1,63 @@
 /*@!Encoding:1252*/
-variables
-{
+variables {
+  
+  // Messages sent from component
   message ACC_Brake acc_brake;
   message ACC_Accelerate acc_accelerate;
   message ACC_Slowdown acc_slowdown;
   message ACC_Error acc_error;
+  
   //message ACC_State acc_state;
   message Display_State display_state;
   
+  // State of Adaptive Cruise Control
   byte acc = 0;
   byte speed;
-  byte speed_adjust;
+  byte distance;
   
+  // State of cars
   byte Lane_Car1;
   byte Lane_Car2;
   int  Speed_Car1;
   int  Speed_Car2;
   long distance_current;
-  byte distance;
   
+  // Max Values
   byte Min_Distance = 10;
   byte Max_Distance = 30;
   int Max_Speed = 180;
   int Min_Speed = 30;
   int Off_Speed = 25;
   
+  // Timer for updating display
   msTimer timer_display;
   const byte TIMEOUT_DISPLAY = 10;
+  // Timer for sending Accelerate Messages
+  msTimer timer_accelerate;
+  const byte TIMEOUT_ACCELERATE = 10;
+  // Timer for sending Slowdown Messages
+  msTimer timer_slowdown;
+  const byte TIMEOUT_SLOWDOWN = 10;
+  // Timer for sending Brake Messages
+  msTimer timer_brake;
+  const byte TIMEOUT_BRAKE = 5;
+  
 }
 
-on timer timer_display
-{
+// Initialize component
+on start {
   setTimer(timer_display, TIMEOUT_DISPLAY);
-
   sendSettings();
 }
 
-// Adjust Distance to value sent from display
-on message Distance_Adjust
-{
+// Send periodically updates to display
+on timer timer_display {
+  setTimer(timer_display, TIMEOUT_DISPLAY);
+  sendSettings();
+}
+
+// Adjust Distance to request sent from display
+on message Distance_Adjust {
   if(acc==1) {
     if(this.Distance_Adjust >= Min_Distance && this.Distance_Adjust <= Max_Distance) {
      distance =  this.Distance_Adjust;
@@ -46,9 +65,8 @@ on message Distance_Adjust
   }
 }
 
-// Adjust Speed from value sent from display
-on message Speed_Adjust
-{
+// Adjust Speed from request sent from display
+on message Speed_Adjust {
   if(acc == 1) {
     if(this.Speed_Adjust >= Min_Speed && this.Speed_Adjust <= Max_Speed) {
       speed = this.Speed_Adjust;
@@ -57,8 +75,7 @@ on message Speed_Adjust
 }
 
 // Turn on ACC and adjust values if neccessary
-on message ACC_State
-{
+on message ACC_State {
   if(Speed_Car1 > Off_Speed && Speed_Car1 < Max_Speed) {
     acc = this.ACC_State;
     if(acc == 1) {
@@ -67,18 +84,18 @@ on message ACC_State
   }
 }
 
-on message Manual_Brake
-{
+// React on driver breaking manually
+on message Manual_Brake {
   acc = 0;
 }
 
-on message Manual_Accelerate
-{
+// React on driver accelerating manually
+on message Manual_Accelerate {
   acc = 0;
 }
 
-on message Car1_State
-{
+// Update State of car we control
+on message Car1_State {
   Speed_Car1 = this.Speed_Car1_Current;
   if(this.Speed_Car1_Current < Off_Speed)
   {
@@ -90,36 +107,93 @@ on message Car1_State
   }
 }
 
-on message Car2_State
-{
+// Update State of other car
+on message Car2_State {
   Speed_Car2 = this.Speed_Car2_Current;
   Lane_Car2 = this.Lane_Car2_Current;
 }
 
-on message Distance_Current
-{
+// Update on Distance between both cars and handle
+on message Distance_Current {
   distance_current = this.Distance_Current;
   if(acc == 1) {
-    if(Lane_Car1 == Lane_Car2) {
-      if( (double)distance_current < ((((double)distance/10.0)*((double)speed/3.6))*100.0) ) {
-        // Further check if dangerous situation, if yes send addBrake
-        sendACCSlowdown();
-        write("Slowdown");
-      } else {
-        if(Speed_Car1 < speed) {
-          sendACCAccelerate();
-          write("Accelerate");
+      // Car is too fast
+      if( (double)distance_current <= getCurrentDistanceInM()) {
+        if(Lane_Car1 == Lane_Car2) {
+          if(situationCritical((double)distance_current, getCurrentDistanceInM()) == 1) {
+            manageBrake();
+          } else {
+            manageSlowdown();
+          }
         }
       }
+      // Car is faster than ACC speed
+      else if(Speed_Car1 > speed) {
+        manageSlowdown();
+      }
+      // Car is slower than ACC speed
+      else if(Speed_Car1 < speed) {
+        manageAccelerate();
+      }
     }
+}
+
+// ======================= Send messages =======================
+
+manageAccelerate() {
+  if(!isTimerActive(timer_accelerate)) {
+    setTimer(timer_accelerate, TIMEOUT_ACCELERATE);
   }
 }
 
-on start
-{
-  setTimer(timer_display, TIMEOUT_DISPLAY);
-  sendSettings();
+manageBrake() {
+  if(!isTimerActive(timer_brake)) {
+    setTimer(timer_brake, TIMEOUT_BRAKE);
+  }
 }
+
+manageSlowdown() {
+  if(!isTimerActive(timer_slowdown)) {
+    setTimer(timer_slowdown,TIMEOUT_SLOWDOWN);
+  }
+}
+
+on timer timer_accelerate {
+  sendACCAccelerate(); 
+}
+
+on timer timer_brake {
+  sendACCBrake(); 
+}
+
+on timer timer_slowdown {
+  sendACCSlowdown();
+}
+
+sendACCAccelerate() {
+  acc_accelerate.PedalTravel_ACC_Accelerate = 1;
+  output(acc_accelerate);
+}
+
+sendACCBrake() {
+  acc_brake.PedalTravel_ACC_Brake = 1;
+  output(acc_brake);
+}
+
+sendACCSlowdown() {
+  acc_slowdown.PedalTravel_ACC_Slowdown = 1;
+  output(acc_slowdown);
+}
+
+sendSettings() {
+  display_state.ACC_State = acc;
+  display_state.Speed_Adjusted = speed;
+  display_state.Distance_Adjusted = distance;
+  
+  output(display_state);
+}
+
+// ==================== Utilities ====================
 
 // Set Distance to valid value and speed to current speed of Car 1
 initAcc() {
@@ -131,42 +205,10 @@ initAcc() {
   }
 }
 
-sendAccelerate() {
-  
+double getCurrentDistanceInM() {
+  return ((((double)distance/10.0)*((double)Speed_Car1/3.6))*100.0);
 }
 
-sendACCAccelerate()
-{
-  acc_accelerate.PedalTravel_ACC_Accelerate = 1;
-  output(acc_accelerate);
+byte situationCritical(double desiredDistance, double actualDistance) {
+  return 1;
 }
-
-sendBrake() {
-  
-}
-
-sendACCBrake()
-{
-  acc_brake.PedalTravel_ACC_Brake = 1;
-  output(acc_brake);
-}
-
-sendSlowdown() {
-  
-}
-
-sendACCSlowdown()
-{
-  acc_slowdown.PedalTravel_ACC_Slowdown = 1;
-  output(acc_slowdown);
-}
-
-sendSettings()
-{
-  display_state.ACC_State = acc;
-  display_state.Speed_Adjusted = speed;
-  display_state.Distance_Adjusted = distance;
-  
-  output(display_state);
-}
-
