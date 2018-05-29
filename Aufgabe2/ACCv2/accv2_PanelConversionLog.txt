@@ -1,0 +1,15 @@
+Datum / Uhrzeit
+===============
+29.05.2018 / 13:51
+
+Konvertierungsbericht:
+======================
+Information: Das Panel 'C:\Users\Fabian Sorn\Desktop\Aufgabe2\ACCv2\maindisplay_ver41.cnp' wurde erfolgreich konvertiert.
+
+[Added Panels]
+Folgende Panels wurden der Konfiguration hinzugefügt:
+C:\Users\Fabian Sorn\Desktop\Aufgabe2\ACCv2\maindisplay_ver41.xvp
+
+[Removed Panels]
+Folgende Panels wurden aus der Konfiguration entfernt:
+C:\Users\Fabian Sorn\Desktop\Aufgabe2\ACCv2\maindisplay_ver41.cnp
