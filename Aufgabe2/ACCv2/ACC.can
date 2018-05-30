@@ -22,12 +22,13 @@ variables {
   int  Speed_Car2;
   long distance_current;
   
-  // Max Values
+  // Max Values and Parameters
   byte Min_Distance = 10;
   byte Max_Distance = 30;
   int Max_Speed = 180;
   int Min_Speed = 30;
   int Off_Speed = 25;
+  double criticalDistanceFactor = 0.3;
   
   // Timer for updating display
   msTimer timer_display;
@@ -116,23 +117,21 @@ on message Car2_State {
 // Update on Distance between both cars and handle
 on message Distance_Current {
   distance_current = this.Distance_Current;
-  if(acc == 1) {
-      // Car is too fast
-      if( (double)distance_current <= getCurrentDistanceInM()) {
+  if(ACCisOn()) {
+      if(getCurrentDistanceInSec() <= ((double)distance)) {
+        // Distance to car in front is too short
         if(Lane_Car1 == Lane_Car2) {
-          if(situationCritical((double)distance_current, getCurrentDistanceInM()) == 1) {
+          if(situationCritical() == 1) {
             manageBrake();
           } else {
             manageSlowdown();
           }
         }
-      }
-      // Car is faster than ACC speed
-      else if(Speed_Car1 > speed) {
+      } else if(Speed_Car1 > speed) {
+        // Car is faster than ACC speed
         manageSlowdown();
-      }
-      // Car is slower than ACC speed
-      else if(Speed_Car1 < speed) {
+      } else if(Speed_Car1 < speed) {
+        // Car is slower than ACC speed
         manageAccelerate();
       }
     }
@@ -198,17 +197,40 @@ sendSettings() {
 // Set Distance to valid value and speed to current speed of Car 1
 initAcc() {
   if(distance < Min_Distance || distance > Max_Distance) {
+    // Mid between the distances max and min value
     distance = (Min_Distance + ((Max_Distance - Min_Distance) / 2));  
   }
   if(Speed_Car1 > Min_Speed && Speed_Car1 < Max_Speed) {
+    // Set desired speed to current speed of car 1
     speed = Speed_Car1;
   }
 }
 
-double getCurrentDistanceInM() {
-  return ((((double)distance/10.0)*((double)Speed_Car1/3.6))*100.0);
+byte ACCisOn() {
+  return acc;
 }
 
-byte situationCritical(double desiredDistance, double actualDistance) {
-  return 1;
+// Converts current distance in m into sec depending on current speed
+double getCurrentDistanceInSec() {
+   return(((double)distance_current/10)/getCurrentSpeedInMperS());
+}
+
+// Convert Speed in Meters per Second 
+double getCurrentSpeedInMperS() {
+  return ((double)Speed_Car1/3.6);
+}
+
+// Boundary, when the car should brake instead of slowdown
+double getCriticalDistanceInSec() {
+  return criticalDistanceFactor * (double)distance;
+}
+
+// situation is critical, if the actual distance is smaller
+// or equal compared to the ciritical distance
+byte situationCritical() {
+  if(getCurrentDistanceInSec() <= getCriticalDistanceInSec()) {
+    return 1;
+  } else {
+    return 0; 
+  }
 }
