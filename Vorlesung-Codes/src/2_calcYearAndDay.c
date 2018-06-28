@@ -22,7 +22,7 @@ void fromConsole() {
     printf("Enter days passed since 01.01.1980:\n> ");
     scanf ("%d",&n);
     result = calcYearAndDate(n);
-    printf("\nYear: %d, Day: %d", result.year, result.day);
+    printf("\nYear: %d, Day: %d\n", result.year, result.day);
 }
 
 // test if infinite loop is happening here
