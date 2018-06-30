@@ -1,6 +1,1 @@
-# For Linux:
-# Ignore Everything but Sourcefiles
-*
-!*.c
-!Makefile
-!.sh
+bin
