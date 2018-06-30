@@ -16,7 +16,7 @@ mkdir bin || {
     cd src
     for filename in *.c; do
         echo -e "${GREEN}${bold}[build.sh]: Compile $filename in 32bit.${normal}${NC}"
-        gcc -m32 -w -o "../bin/32bit/${filename//.c/}" "$filename" || {
+        gcc -m32 -o "../bin/32bit/${filename//.c/}" "$filename" || {
             echo -e "${RED}${bold}[build.sh]: Compilation of $filename in 32bit failed.${normal}${NC}"
         }
     done
@@ -28,7 +28,7 @@ mkdir bin || {
     cd src
     for filename in *.c; do
         echo -e "${GREEN}${bold}[build.sh]: Compile $filename in 64bit.${normal}${NC}"
-        gcc -m64 -w -o "../bin/64bit/${filename//.c/}" "$filename" || {
+        gcc -m64 -o "../bin/64bit/${filename//.c/}" "$filename" || {
             echo -e "${RED}${bold}[build.sh]: Compilation of $filename in 64bit failed.${normal}${NC}"
         }
     done
