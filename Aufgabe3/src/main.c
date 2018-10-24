@@ -2,7 +2,7 @@
 #include "../include/reader.h"
 #include "../include/codeGenerator.h"
 
-#define satteliteCount 24
+#define satteliteCount 1
 #define sumSigCount 1023
 
 int main (int argc, const char* argv[]) {
