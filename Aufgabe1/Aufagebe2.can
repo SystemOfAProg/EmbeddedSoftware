@@ -1,0 +1,38 @@
+/* ------- Sendmodul --- begin generated Comment ----
+| CAPL template for CANoe IL models
+| ActiveX based generation
+| Functionality is done in CANoe directly - you can add application code for this node
+   ---------- end generated Comment---- */
+
+variables
+{
+  //Please insert your code below this comment
+  message recv1_Nachricht msg2;
+  int counter;
+}
+on message Generator_Nachricht
+{
+	output(msg2);
+  counter++;
+  if(counter%10 == 0){
+    write("%d Nachrichten empfangen", counter);
+  }
+}
+on preStart
+{
+  //Please insert your code below this comment
+  
+}
+
+on start
+{
+  //Please insert your code below this comment
+  
+}
+
+on stopMeasurement
+{
+  //Please insert your code below this comment
+  
+}
+
