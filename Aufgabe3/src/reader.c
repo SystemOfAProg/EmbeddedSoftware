@@ -2,41 +2,39 @@
 #include <stdlib.h>
 #include <string.h>
 
-void read(const char* fileName, char* separator, int* arr){
+void read(const char* fileName, char* separator, char* arr){
   // File to read
 	FILE *fs;
-	printf("Read interger values of sum signal from file %s\n", fileName);
+	printf("[Reader]: Read interger values of sum signal from file %s\n",  fileName);
   // Current character in File
 	char ch;
   // Buffer for reading multi-char integer values
-  char* buffer[32];
-  int i = 0;
-  // Current index for Integer Value Storage
-  int j = 0;
+  char buffer[32];
+  int charBufferIndex = 0;
+  int integerValueArrayIndex = 0;
   fs = fopen(fileName, "r");
-	int negativeInteger = 0;
+	if(fs == NULL) {
+		printf("[Reader]: File with name %s could not be opened. Please check if the file exists.", fileName);
+	} else {
+		printf("[Reader]: File with name %s could be opened. Start reading integer values.", fileName);
+	}
   while(fs != NULL){
 		ch = fgetc(fs);
     if(ch == EOF){
 			break;
 		} else if(ch == *separator){
-			if(negativeInteger > 0) {
-      	arr[j] = atoi(buffer);
+			if(buffer[0] == '-') {
+      	arr[integerValueArrayIndex] = - atoi((const char*)buffer + sizeof(char));
 			} else {
-				arr[j] = -atoi(buffer);
+				arr[integerValueArrayIndex] = atoi((const char*)buffer);
 			}
-			printf("%s\n", buffer);
-      j++;
-			negativeInteger = 0;
+      integerValueArrayIndex++;
       bzero(buffer, 32);
-      i = 0;
+      charBufferIndex = 0;
       continue;
 		} else{
-			buffer[i] = ch;
-      i++;
+			buffer[charBufferIndex] = ch;
+      charBufferIndex++;
 		}
-	}
-  for(i = 0; i < j; i++){
-		printf("Number [%d]: %d\n", i, arr[i]);
 	}
 }

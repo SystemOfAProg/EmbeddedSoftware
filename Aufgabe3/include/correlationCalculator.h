@@ -6,6 +6,6 @@
  *  Calculates the correlation product of a chip-sequence and
  *  a sum signal
  */
-int correlate(char vector1[], char[] vector2[]);
+int correlate(char vector1[], char vector2[], int codeLength, int sumSignalLength);
 
 #endif

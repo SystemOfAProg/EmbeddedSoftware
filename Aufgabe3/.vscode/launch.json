@@ -9,12 +9,15 @@
             "type": "cppdbg",
             "request": "launch",
             "program": "${workspaceFolder}/bin/main",
-            "args": [],
+            "args": [
+                "${workspaceFolder}/assets/summensignal.txt"
+            ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
             "environment": [],
             "externalConsole": true,
-            "MIMode": "lldb"
+            "MIMode": "lldb",
+            "preLaunchTask": "build"
         }
     ]
 }

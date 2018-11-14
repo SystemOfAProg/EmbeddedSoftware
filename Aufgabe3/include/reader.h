@@ -4,6 +4,6 @@
 
 /* Prototypes for the functions */
 /* Sums two ints */
-void read(const char* fileName, char* separator, int* arr);
+void read(const char* fileName, char* separator, char* arr);
 
 #endif

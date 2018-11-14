@@ -1,5 +1,5 @@
-#ifndef CODE_GENERATOR
-#define CODE_GENERATOR
+#ifndef SIGNAL_DECODER
+#define SIGNAL_DECODER
 /* ^^ these are the include guards */
 
 /**
@@ -7,6 +7,6 @@
  *  Parameters: registers, that are used to make the delay of
  *              the second mother-code
  */
-void generateCode(short satteliteID, char* code, int codeLength);
+char decode(char* sumSignal, int sumSignalLength, int position, char* code, int codeLength);
 
 #endif

@@ -3,7 +3,6 @@
 #include <string.h>
 
 #define NELEMS(x)  (sizeof(x) / sizeof((x)[0]))
-#define codeLength 1023
 #define registerLength 10
 
 short reg1positions[2] = {3,10};
@@ -66,20 +65,18 @@ char xorBits(short reg, short positions[], short positionsLength) {
 	return result;
 }
 
-char* generateCode(short satteliteID) {
-	char code[codeLength];
+void generateCode(short satteliteID, char* code, int codeLength) {
 	short register1 = regStartValue;
 	short register2 = regStartValue;
 	int i;
 	printf("[Code]:\t\t Generate Code for sattelite #%d.\n", satteliteID);
 	for(i=0; i<codeLength; i++) {
 		char newBitReg1 = xorBits(register1, reg1positions, NELEMS(reg1positions));
-		printBit(newBitReg1);
-		// char newBitReg2 = xorBits(register2, reg2positions, NELEMS(reg2positions));
-		// char delayedBitFromReg2 = xorBits(register2, reg2delayPositions[satteliteID], NELEMS(reg2delayPositions[satteliteID]));
-		// code[i]=(register1 & 1) ^ delayedBitFromReg2;
+		char newBitReg2 = xorBits(register2, reg2positions, NELEMS(reg2positions));
+		char delayedBitFromReg2 = xorBits(register2, reg2delayPositions[satteliteID-1], NELEMS(reg2delayPositions[satteliteID]));
+		code[i]=(register1 & 1) ^ delayedBitFromReg2;
 		register1 = (register1 >> 1) + (newBitReg1 << (registerLength - 1));
-		// register2 = (register2 >> 1) + (newBitReg2 << (registerLength - 1));
+		register2 = (register2 >> 1) + (newBitReg2 << (registerLength - 1));
 	}
-	return code;
+	return;
 }
