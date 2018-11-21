@@ -12,9 +12,8 @@ int correlate(char vector1[], char vector2[], int codeLength, int sumSignalLengt
 			// printf("\n%d \t %d \t = \t %d", v1Value,v2Value, v1Value*v2Value);
 			product += v1Value * v2Value;
 		}
-		// printf("\nKorrelationsprodukt: %d", product);
 		// Check if normalized correlation product is not near 0
-		if (product > highestNonPeakValue || product < lowestNonPeakValue) {
+		if (product >= highestNonPeakValue || product <= lowestNonPeakValue) {
 			return shift;
 		}
 	}

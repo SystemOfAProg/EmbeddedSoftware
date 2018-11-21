@@ -69,13 +69,11 @@ void generateCode(short satteliteID, char* code, int codeLength) {
 	short register1 = regStartValue;
 	short register2 = regStartValue;
 	int i;
-	// printf("[Code]:\t\t Generate Code for sattelite #%d.\n", satteliteID);
 	for(i=0; i<codeLength; i++) {
 		char newBitReg1 = xorBits(register1, reg1positions, NELEMS(reg1positions));
 		char newBitReg2 = xorBits(register2, reg2positions, NELEMS(reg2positions));
-		char delayedBitFromReg2 = xorBits(register2, reg2delayPositions[satteliteID-1], NELEMS(reg2delayPositions[satteliteID]));
+		char delayedBitFromReg2 = xorBits(register2, reg2delayPositions[satteliteID], NELEMS(reg2delayPositions[satteliteID]));
 		code[i]=(register1 & 1) ^ delayedBitFromReg2;
-		// Replace 0 with -1 for Correlation Calculation
 		if(code[i] == 0) {
 			code[i] = -1;
 		}

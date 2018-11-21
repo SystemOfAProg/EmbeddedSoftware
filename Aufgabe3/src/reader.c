@@ -16,7 +16,7 @@ void read(const char* fileName, char* separator, char* arr){
 	if(fs == NULL) {
 		printf("[Reader]: File with name %s could not be opened. Please check if the file exists.", fileName);
 	} else {
-		printf("[Reader]: File with name %s could be opened. Start reading integer values.", fileName);
+		printf("[Reader]: Read Sum-Signal from %s.", fileName);
 	}
   while(fs != NULL){
 		ch = fgetc(fs);

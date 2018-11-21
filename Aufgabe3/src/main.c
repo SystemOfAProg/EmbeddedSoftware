@@ -8,13 +8,15 @@
 #define satteliteCount 24
 #define sumSignalLength 1023
 #define codeLength 1023
-#define maxNoise 63
+// Values taken from observation, TODO: check if they are correct
+#define maxNoise 1024
+#define minNoise -1024
 
 int main (int argc, const char* argv[]) {
 	// sum signal read from text file
 	char sumSignal [sumSignalLength];
 	int codeFoundInSignalIndex [satteliteCount];
-	char messagedBits[satteliteCount];
+	int messagedBits[satteliteCount];
 	read((const char*)argv[1], " ", sumSignal);
 	// generatede code for the sattelite
 	char code[codeLength];
@@ -22,15 +24,15 @@ int main (int argc, const char* argv[]) {
 	int correlationShiftIndex = 0;
 	// Check codes of all 24 sattelites
 	printf("\nSattelite-ID \t Code-Shift \t Messaged Bit\n");
-	for(satteliteID=1; satteliteID <= satteliteCount; satteliteID++) {
+	for(satteliteID=0; satteliteID < satteliteCount; satteliteID++) {
 		generateCode(satteliteID, code, codeLength);
-		correlationShiftIndex = correlate(sumSignal, code, codeLength, sumSignalLength, 5*maxNoise, -5*maxNoise);
-		codeFoundInSignalIndex[satteliteID - 1] = correlationShiftIndex;
+		correlationShiftIndex = correlate(sumSignal, code, codeLength, sumSignalLength, maxNoise, minNoise);
+		codeFoundInSignalIndex[satteliteID] = correlationShiftIndex;
 		if (correlationShiftIndex != -1) {
-			messagedBits[satteliteID - 1] = decode(sumSignal, sumSignalLength, correlationShiftIndex, code, codeLength);
-			printf("%d \t\t %d \t\t %d\n", satteliteID, codeFoundInSignalIndex[satteliteID - 1], messagedBits[satteliteID - 1]);
+			messagedBits[satteliteID] = decode(sumSignal, sumSignalLength, correlationShiftIndex, code, codeLength);
+			printf("%d \t\t %d \t\t %d\n", satteliteID, codeFoundInSignalIndex[satteliteID], messagedBits[satteliteID]);
 		} else {
-			messagedBits[satteliteID - 1] = -1;
+			messagedBits[satteliteID] = -1;
 		}
 	}
 	return 0;

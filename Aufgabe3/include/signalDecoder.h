@@ -7,6 +7,6 @@
  *  Parameters: registers, that are used to make the delay of
  *              the second mother-code
  */
-char decode(char* sumSignal, int sumSignalLength, int position, char* code, int codeLength);
+int decode(char* sumSignal, int sumSignalLength, int position, char* code, int codeLength);
 
 #endif
