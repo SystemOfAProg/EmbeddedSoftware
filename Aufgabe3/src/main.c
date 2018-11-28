@@ -17,7 +17,10 @@ int main (int argc, const char* argv[]) {
 	char sumSignal [sumSignalLength];
 	int codeFoundInSignalIndex [satteliteCount];
 	int messagedBits[satteliteCount];
-	read((const char*)argv[1], " ", sumSignal);
+	if (read((const char*)argv[1], " ", sumSignal) == -1) {
+		printf("[ERROR]: Passed file could not be opened.");
+		return -1;
+	}
 	// generatede code for the sattelite
 	char code[codeLength];
 	int satteliteID;
@@ -32,6 +35,7 @@ int main (int argc, const char* argv[]) {
 			messagedBits[satteliteID] = decode(sumSignal, sumSignalLength, correlationShiftIndex, code, codeLength);
 			printf("%d \t\t %d \t\t %d\n", satteliteID, codeFoundInSignalIndex[satteliteID], messagedBits[satteliteID]);
 		} else {
+			// -1 -> no Bit was found in this particular message
 			messagedBits[satteliteID] = -1;
 		}
 	}

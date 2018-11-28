@@ -2,10 +2,9 @@
 #include <stdlib.h>
 #include <string.h>
 
-void read(const char* fileName, char* separator, char* arr){
+int read(const char* fileName, char* separator, char* arr){
   // File to read
 	FILE *fs;
-	printf("[Reader]: Read interger values of sum signal from file %s\n",  fileName);
   // Current character in File
 	char ch;
   // Buffer for reading multi-char integer values
@@ -14,9 +13,7 @@ void read(const char* fileName, char* separator, char* arr){
   int integerValueArrayIndex = 0;
   fs = fopen(fileName, "r");
 	if(fs == NULL) {
-		printf("[Reader]: File with name %s could not be opened. Please check if the file exists.", fileName);
-	} else {
-		printf("[Reader]: Read Sum-Signal from %s.", fileName);
+		return -1;
 	}
   while(fs != NULL){
 		ch = fgetc(fs);
@@ -37,4 +34,5 @@ void read(const char* fileName, char* separator, char* arr){
       charBufferIndex++;
 		}
 	}
+	return 0;
 }
