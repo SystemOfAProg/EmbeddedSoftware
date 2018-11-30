@@ -10,8 +10,8 @@
             "request": "launch",
             "program": "${workspaceFolder}/bin/main",
             "args": [
-                "${workspaceFolder}/assets/summensignal-falsch.txt"
-                // "${workspaceFolder}/assets/summensignal.txt"
+                // "${workspaceFolder}/assets/summensignal-falsch.txt"
+                "${workspaceFolder}/assets/summensignal.txt"
             ],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
